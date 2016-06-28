@@ -1,24 +1,26 @@
 import csv
+import datetime
 
 print "; -*- ledger -*-"
 print ""
 print "2016/01/01 * Opening Balances"
-print "    Assets:Polo                    0 DASH"
+print "    Assets:Polo                    $0"
 print ""
 
-print "P 2016/06/27 01:00:00 USDT $1.0"
-print "P 2016/06/27 01:00:00 USD $1.0"
-print "P 2016/06/27 01:00:00 BTC $660.0"
-print "P 2016/06/27 01:00:00 DASH $7.09"
-print "P 2016/06/27 01:00:00 LTC $4.20"
-print "P 2016/06/27 01:00:00 ETH $13.80"
-print "P 2016/06/27 01:00:00 DAO $0.103786829"
-print "P 2016/06/27 01:00:00 LSK $0.313804287"
+nowstr = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+
+print "P %s USDT $1.0" % nowstr
+print "P %s BTC $655.0" % nowstr
+print "P %s DASH $7.09" % nowstr
+print "P %s LTC $4.20" % nowstr
+print "P %s ETH $13.80" % nowstr
+print "P %s DAO $0.1038" % nowstr
+print "P %s LSK $0.3138" % nowstr
 print ""
 
 with open('tradeHistory.csv', 'rb') as csvfile:
-    sr = csv.reader(csvfile, delimiter=',')
-    for row in sr:
+    th = csv.reader(csvfile, delimiter=',')
+    for row in th:
         if row[0] == "Date":
             continue
         date = row[0].split(" ")[0]
@@ -37,7 +39,6 @@ with open('tradeHistory.csv', 'rb') as csvfile:
             ba = float(row[6])
             bc = quote
             bf = abs(ba - abs(float(row[9])))
-
             sa = float(row[5])
             sc = base
             sf = abs(sa - abs(float(row[10])))
@@ -60,6 +61,34 @@ with open('tradeHistory.csv', 'rb') as csvfile:
         print "    Currency:{0}   {1:.8f} {2}".format(bc, -ba, bc)
         print "    Assets:Polo:{0}    {1:.8f} {2}".format(sc, -sr, sc)
         print "    Currency:{0}   {1:.8f} {2}".format(sc, sa, sc)
-        print "    Expense:TradeFee    %s" % cost
+        print "    Expenses:TradeFee    %s" % cost
+        print ""
+
+with open('depositHistory.csv', 'rb') as csvfile:
+    dh = csv.reader(csvfile, delimiter=',')
+    for row in dh:
+        if row[0] == "Date":
+            continue
+        date = row[0].split(" ")[0]
+        #2016/06/15 Polo trade (1 BTC = 700 USD)
+        print "%s Polo deposit" % date
+        print "    ; address %s" % row[3]
+        #print "    ; raw sell fee {0:.8f} {1}".format(sf, sc)
+        print "    Assets:Polo:{0}    {1:.8f} {2}".format(row[1], float(row[2]), row[1])
+        print "    Equity:Wallet:{0}   {1:.8f} {2}".format(row[1], -float(row[2]), row[1])
+        print ""
+
+with open('withdrawalHistory.csv', 'rb') as csvfile:
+    wh = csv.reader(csvfile, delimiter=',')
+    for row in wh:
+        if row[0] == "Date":
+            continue
+        date = row[0].split(" ")[0]
+        #2016/06/15 Polo trade (1 BTC = 700 USD)
+        print "%s Polo withdrawal" % date
+        print "    ; address %s" % row[3]
+        #print "    ; raw sell fee {0:.8f} {1}".format(sf, sc)
+        print "    Assets:Polo:{0}    {1:.8f} {2}".format(row[1], -float(row[2]), row[1])
+        print "    Equity:Wallet:{0}   {1:.8f} {2}".format(row[1], float(row[2]), row[1])
         print ""
 
